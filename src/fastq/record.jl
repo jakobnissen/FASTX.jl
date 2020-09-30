@@ -197,6 +197,21 @@ function hasdescription(record)
     return isfilled(record) && record.description != 1:0
 end
 
+"""
+    header(record::Record, sep::Union{AbstractString, AbstractChar})
+
+Return the identifier and description of `record` joined by `sep`.
+"""
+function header(rec::Record, sep::Union{AbstractString, AbstractChar})
+    hasidentifier(rec) || return nothing
+    hasdescription(rec) || return String(rec.data[rec.identifier])
+    buf = IOBuffer()
+    write(buf, view(rec.data, rec.identifier))
+    write(buf, sep)
+    write(buf, view(rec.data, rec.description))
+    return String(take!(buf))
+end
+
 function Base.copy!(dest::BioSequences.LongSequence, src::Record)
     resize!(dest, seqlen(src) % UInt)
     copyto!(dest, 1, src, 1, seqlen(src))

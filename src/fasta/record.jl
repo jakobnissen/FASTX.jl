@@ -201,6 +201,21 @@ function hasdescription(record)
 end
 
 """
+    header(record::Record, sep::Union{AbstractString, AbstractChar})
+
+Return the identifier and description of `record` joined by `sep`.
+"""
+function header(rec::Record, sep::Union{AbstractString, AbstractChar})
+    hasidentifier(rec) || return nothing
+    hasdescription(rec) || return String(rec.data[rec.identifier])
+    buf = IOBuffer()
+    write(buf, view(rec.data, rec.identifier))
+    write(buf, sep)
+    write(buf, view(rec.data, rec.description))
+    return String(take!(buf))
+end
+
+"""
     sequence(::Type{S}, record::Record, [part::UnitRange{Int}])::S
 
 Get the sequence of `record`.
